@@ -1,0 +1,33 @@
+---
+
+- name: install tools
+  apt: name={{ item }} state=present update_cache=yes
+  with_items:
+    - mysql-server
+    - python-mysqldb
+
+- name: ensure mysql started
+  service: name=mysql state=started enabled=yes
+
+- name: creating database
+  mysql_db: name={{ db_name }} state=present
+
+- name: create demo user
+  mysql_user: name={{ db_user }} password={{ db_pass }} 
+              priv={{ db_name }}.*:ALL host='{{ db_host }}' state=present
+
+- name: copy dump file
+  copy: src=../files/hetzner/tmp/{{ db_name }}.sql dest=/tmp/{{ db_name }}.sql
+
+- name: rollout database
+  mysql_db:
+    name: "{{ db_name }}"
+    state: import
+    target: /tmp/{{ db_name }}.sql
+
+- name: show tables in db
+  shell: "mysql -u{{ db_user}} --password={{ db_pass }} {{ db_name}} -e 'show tables;'"
+  register: tables
+  tags: ['db']    
+
+- debug: var=tables.stdout_lines

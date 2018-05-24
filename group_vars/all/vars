@@ -1,7 +1,12 @@
 ---
-db_name: "{{ vault_db_name }}"
-db_user: "{{ vault_db_user }}"
-db_pass: "{{ vault_db_pass }}"
+db_name:   "{{ vault_db_name }}"
+db_user:   "{{ vault_db_user }}"
+db_pass:   "{{ vault_db_pass }}"
 
-app_path: /opt/scrum_ru/wordpress
+app_path:  /opt/scrum_ru/wordpress
+site_name: scrum.ru
+site_key:  scrum_ru
+
+backend_port: 8081
+frontend_port: 80
 

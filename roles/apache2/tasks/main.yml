@@ -1,0 +1,35 @@
+---
+- name: install apache2
+  apt: name={{item}} state=present
+  with_items:
+    - apache2
+    - libapache2-mod-php
+    - php-mysql    
+  notify: restart apache2
+
+- name: delete default symlink
+  file: path=/etc/apache2/sites-enabled/000-default.conf state=absent
+  notify: restart apache2 
+
+- name: do not listen port 80
+  lineinfile: dest=/etc/apache2/ports.conf regexp=^Listen\s80 line="#Listen 80"
+  notify: restart apache2
+
+- name: create site configuration
+  template: src=site.conf.j2 dest=/etc/apache2/sites-available/{{ site_key }}.conf
+  notify: restart apache2
+
+- name: enable configuration
+  file: src=/etc/apache2/sites-available/{{ site_key }}.conf dest=/etc/apache2/sites-enabled/{{ site_key }}.conf state=link
+  notify: restart apache2
+
+- name: create app directory
+  file: path={{ app_path }} owner=www-data group=www-data state=directory mode=0755
+  notify: restart apache2
+
+- name: put test.php
+  copy: src=test.php dest=/{{ app_path }} owner=www-data group=www-data mode=0644
+  notify: restart apache2
+
+- name: ensure apache2 started
+  service: name=apache2 state=started enabled=yes

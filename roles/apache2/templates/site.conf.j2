@@ -1,0 +1,23 @@
+Listen 127.0.0.1:{{ backend_port }}
+NameVirtualHost *:{{ backend_port }}
+<VirtualHost *:{{ backend_port }}>
+        ServerAdmin admin@{{ site_name }}
+        ServerName {{ site_name }}
+        ServerAlias www.{{ site_name }}
+
+        DocumentRoot {{ app_path }}
+        <Directory {{ app_path }}>
+                AllowOverride all
+                Require all granted
+        </Directory>
+
+        ErrorLog /var/log/apache2/{{ site_key }}-error.log
+
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel warn
+
+        CustomLog /var/log/apache2/{{ site_key }}-access.log combined
+        ServerSignature Off
+
+</VirtualHost>

@@ -2,10 +2,10 @@
 localhost ansible_connection=local
 
 [loadbalancer]
-hetzner
+ubuntu-dev
 
 [webserver]
-hetzner
+ubuntu-dev
 
 [database]
-hetzner
+ubuntu-dev

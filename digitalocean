@@ -2,10 +2,10 @@
 localhost ansible_connection=local
 
 [loadbalancer]
-hetzner
+do-node3
 
 [webserver]
-hetzner
+do-node3
 
 [database]
-hetzner
+do-node3
