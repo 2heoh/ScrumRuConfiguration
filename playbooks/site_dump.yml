@@ -1,0 +1,42 @@
+---
+- hosts: database
+  become: true
+  gather_facts: false
+  tasks:
+
+    - name: backup databases
+      shell: "mysqldump -u{{ db_user}} --password={{ db_pass }} {{ db_name}} > /tmp/{{ db_name }}.sql"
+      tags: ['db']
+
+    - name: fetching db dump
+      fetch: src=/tmp/{{ db_name }}.sql dest=../files
+      tags: ['db']
+
+    - name: cleanup sql-dump
+      file: path=/tmp/{{ db_name }}.sql state=absent
+      tags: ['db']
+
+- hosts: webserver
+  become: true
+  gather_facts: false
+  tasks:
+
+    - name: copy files 
+      shell: "cp -R {{ app_path}} /tmp/scripts"
+      tags: ['site']
+
+    - name: archive files 
+      shell: "cd /tmp/scripts && tar -czvf /tmp/site.tar.gz ."
+      tags: ['site']
+
+    - name: fetching all app files
+      fetch: src=/tmp/site.tar.gz dest=../files
+      tags: ['site']
+
+    - name: cleanup site files
+      file: path={{item}} state=absent
+      with_items:
+        - /tmp/scripts  
+        - /tmp/site.tar.gz
+      tags: ['site']
+
